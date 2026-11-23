@@ -286,6 +286,35 @@
     .legend-item strong { color: #334155; font-size: 10px; font-weight: 650; }
     .note { margin: 17px 0 0; color: #94a3b8; font-size: 10px; line-height: 1.5; }
 
+    .schedule-panel { grid-column: 1 / -1; }
+    .schedule-panel details { min-width: 0; }
+    .schedule-panel summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--ink);
+      cursor: pointer;
+      font: 700 15px/1.4 var(--heading);
+      list-style: none;
+    }
+    .schedule-panel summary::-webkit-details-marker { display: none; }
+    .schedule-panel summary::after {
+      color: var(--teal-dark);
+      content: "+";
+      font: 600 22px/1 var(--body);
+    }
+    .schedule-panel details[open] summary::after { content: "−"; }
+    .schedule-hint { display: block; margin-top: 4px; color: var(--muted); font: 400 12px/1.5 var(--body); }
+    .schedule-table-wrap { overflow-x: auto; margin-top: 18px; }
+    .schedule-table { width: 100%; border-collapse: collapse; text-align: right; white-space: nowrap; }
+    .schedule-table th, .schedule-table td { padding: 11px 12px; border-bottom: 1px solid var(--line); }
+    .schedule-table th { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .schedule-table td { font-size: 12px; }
+    .schedule-table th:first-child, .schedule-table td:first-child { text-align: left; }
+    .schedule-table tbody tr:last-child td { border-bottom: 0; }
+    .schedule-table .schedule-markup { color: var(--amber); }
+
     footer { border-top: 1px solid var(--line); padding: 20px 0 24px; color: #94a3b8; text-align: center; font-size: 11px; }
     footer span { padding-inline: 5px; }
 
@@ -443,6 +472,27 @@
         </div>
         <p class="note">Estimate uses monthly compounding on a reducing balance. Actual terms may vary by lender and fees.</p>
       </section>
+
+      <section class="panel schedule-panel" aria-label="Monthly amortization schedule">
+        <details>
+          <summary>
+            <span>Monthly amortization schedule<span class="schedule-hint">See how each payment reduces your balance.</span></span>
+          </summary>
+          <div class="schedule-table-wrap">
+            <table class="schedule-table numeric">
+              <thead>
+                <tr>
+                  <th scope="col">Month</th>
+                  <th scope="col">Principal Paid</th>
+                  <th scope="col">Markup Paid</th>
+                  <th scope="col">Remaining Balance</th>
+                </tr>
+              </thead>
+              <tbody id="schedule-body"></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
     </section>
   </main>
 
@@ -461,6 +511,7 @@
         emi: document.getElementById("emi-output"),
         markup: document.getElementById("markup-output"),
         repayment: document.getElementById("repayment-output"),
+        schedule: document.getElementById("schedule-body"),
         principalBar: document.getElementById("principal-bar"),
         markupBar: document.getElementById("markup-bar"),
         principalShare: document.getElementById("principal-share"),
@@ -469,6 +520,10 @@
         breakdownBar: document.getElementById("breakdown-bar")
       };
       const currency = new Intl.NumberFormat("en-PK", { maximumFractionDigits: 0 });
+
+      function formatMoney(value) {
+        return `PKR ${currency.format(Math.round(value))}`;
+      }
 
       function clamp(value, min, max) {
         return Math.min(max, Math.max(min, value));
@@ -510,6 +565,24 @@
           "aria-label",
           `Repayment breakdown: principal ${roundedPrincipalPercent} percent, markup ${roundedMarkupPercent} percent`
         );
+
+        const schedule = document.createDocumentFragment();
+        let balance = principal;
+        for (let month = 1; month <= months; month += 1) {
+          const markupPaid = balance * monthlyRate;
+          const principalPaid = month === months ? balance : Math.min(balance, emi - markupPaid);
+          balance = Math.max(0, balance - principalPaid);
+
+          const row = document.createElement("tr");
+          [month, formatMoney(principalPaid), formatMoney(markupPaid), formatMoney(balance)].forEach((value, index) => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            if (index === 2) cell.className = "schedule-markup";
+            row.append(cell);
+          });
+          schedule.append(row);
+        }
+        outputs.schedule.replaceChildren(schedule);
       }
 
       Object.values(fields).forEach((field) => {
