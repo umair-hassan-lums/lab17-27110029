@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8fafc">
+  <meta name="description" content="Explore investment growth with the FinPulse PK investment and ROI calculator.">
+  <title>Investment &amp; ROI Calculator | FinPulse PK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #f8fafc;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --teal: #0d9488;
+      --teal-dark: #0f766e;
+      --amber: #d97706;
+      --heading: "Plus Jakarta Sans", sans-serif;
+      --body: "Inter", sans-serif;
+      font-family: var(--body);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--page); color: var(--ink); font-size: 15px; line-height: 1.6; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .numeric { font-variant-numeric: tabular-nums; }
+    .shell { width: min(1120px, calc(100% - 48px)); margin-inline: auto; }
+
+    .topbar {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(226, 232, 240, .8);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--ink);
+      text-decoration: none;
+      font: 800 17px/1 var(--heading);
+      letter-spacing: -.55px;
+    }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 11px;
+      color: white;
+      background: var(--teal);
+    }
+    .brand-mark svg { width: 19px; height: 19px; }
+    nav { display: flex; align-items: center; gap: 8px; }
+    nav a {
+      padding: 9px 13px;
+      border-radius: 9px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color .18s, background .18s;
+    }
+    nav a:hover, nav a[aria-current="page"] { color: var(--teal-dark); background: #e6fffb; }
+
+    h1, h2, h3, p { margin-top: 0; }
+    .hero { position: relative; overflow: hidden; padding: 51px 24px 36px; text-align: center; }
+    .hero::before, .hero::after {
+      position: absolute;
+      z-index: -1;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      content: "";
+    }
+    .hero::before { top: -25px; left: 7%; background: radial-gradient(circle, rgba(204, 251, 241, .7), transparent 70%); }
+    .hero::after { top: -20px; right: 7%; background: radial-gradient(circle, rgba(254, 243, 199, .55), transparent 70%); }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid #ccfbf1;
+      border-radius: 999px;
+      color: var(--teal-dark);
+      background: rgba(255,255,255,.72);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .075em;
+      text-transform: uppercase;
+    }
+    .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); }
+    h1 {
+      max-width: 760px;
+      margin: 17px auto 10px;
+      font: 800 clamp(33px, 5vw, 48px)/1.14 var(--heading);
+      letter-spacing: -2px;
+    }
+    h1 span { color: var(--teal); }
+    .hero-copy { max-width: 590px; margin: 0 auto; color: var(--muted); font-size: 14px; }
+    .tagline { margin: 11px 0 0; color: #475569; font-size: 12px; font-weight: 600; }
+
+    .workspace { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 20px; padding-bottom: 24px; }
+    .panel {
+      min-width: 0;
+      padding: 25px;
+      border: 1px solid rgba(226, 232, 240, .85);
+      border-radius: 17px;
+      background: var(--card);
+      box-shadow: 0 12px 35px rgba(15, 23, 42, .045);
+    }
+    .panel-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 20px; }
+    h2 { margin-bottom: 4px; font: 700 18px/1.35 var(--heading); letter-spacing: -.4px; }
+    .panel-subtitle { margin: 0; color: var(--muted); font-size: 11px; }
+    .heading-icon {
+      display: grid;
+      flex: 0 0 36px;
+      height: 36px;
+      place-items: center;
+      border-radius: 11px;
+      color: var(--teal-dark);
+      background: #e6fffb;
+    }
+    .heading-icon svg { width: 19px; height: 19px; }
+
+    .presets { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 22px; }
+    .preset {
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: #475569;
+      background: #fff;
+      font-size: 10px;
+      font-weight: 600;
+      transition: border-color .18s, color .18s, background .18s;
+    }
+    .preset:hover, .preset[aria-pressed="true"] { border-color: #5eead4; color: var(--teal-dark); background: #f0fdfa; }
+    .field { margin-bottom: 20px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .field label { color: #334155; font-size: 11px; font-weight: 650; }
+    .field-hint { color: #94a3b8; font-size: 10px; }
+    .number-wrap { position: relative; }
+    .number-prefix, .number-suffix {
+      position: absolute;
+      top: 50%;
+      color: #94a3b8;
+      font-size: 11px;
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+    .number-prefix { left: 12px; }
+    .number-suffix { right: 12px; }
+    .number-input {
+      width: 100%;
+      height: 42px;
+      padding: 0 46px 0 47px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      outline: none;
+      color: var(--ink);
+      background: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .number-input.no-prefix { padding-left: 12px; }
+    .number-input.with-suffix { padding-right: 43px; }
+    .number-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13, 148, 136, .13); }
+    input[type="range"] {
+      display: block;
+      width: 100%;
+      height: 5px;
+      margin: 12px 0 0;
+      border-radius: 999px;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      background: #e2e8f0;
+      accent-color: var(--teal);
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      width: 16px; height: 16px; border: 3px solid #fff; border-radius: 50%;
+      appearance: none; -webkit-appearance: none; background: var(--teal);
+      box-shadow: 0 0 0 1px var(--teal), 0 2px 6px rgba(15, 23, 42, .18);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 11px; height: 11px; border: 3px solid #fff; border-radius: 50%;
+      background: var(--teal); box-shadow: 0 0 0 1px var(--teal), 0 2px 6px rgba(15, 23, 42, .18);
+    }
+    .range-limits { display: flex; justify-content: space-between; margin-top: 6px; color: #94a3b8; font-size: 9px; }
+
+    .results-panel { display: flex; flex-direction: column; }
+    .result-feature {
+      padding: 18px 20px;
+      border: 1px solid #ccfbf1;
+      border-radius: 12px;
+      background: linear-gradient(115deg, #f0fdfa, #f8fffe 72%);
+    }
+    .result-label { margin-bottom: 6px; color: #475569; font-size: 11px; font-weight: 600; }
+    .feature-value {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 7px;
+      color: var(--ink);
+      font: 800 clamp(25px, 3vw, 34px)/1.2 var(--heading);
+      letter-spacing: -1px;
+      font-variant-numeric: tabular-nums;
+    }
+    .currency { color: var(--teal-dark); font: 700 12px/1 var(--body); letter-spacing: 0; }
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 11px; }
+    .result-tile { min-width: 0; padding: 13px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .tile-label { min-height: 32px; margin-bottom: 5px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .tile-value { color: var(--ink); font-size: 12px; font-weight: 700; line-height: 1.45; overflow-wrap: anywhere; }
+    .tile-value.profit { color: var(--amber); }
+    .tile-value.roi { color: var(--teal-dark); font-size: 14px; }
+    .method-note { margin: 13px 0 0; color: #94a3b8; font-size: 9px; line-height: 1.55; }
+
+    .schedule-panel { margin-bottom: 48px; padding: 24px 25px 16px; }
+    .schedule-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 14px; }
+    .schedule-total { color: var(--muted); font-size: 10px; text-align: right; }
+    .schedule-total strong { display: block; color: var(--ink); font-size: 12px; font-weight: 700; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    thead { background: #f8fafc; }
+    th, td { padding: 10px 14px; border-bottom: 1px solid #eef2f6; text-align: right; white-space: nowrap; }
+    th { color: #64748b; font-size: 10px; font-weight: 600; }
+    th:first-child, td:first-child { text-align: left; }
+    td { color: #334155; }
+    td:first-child { color: var(--ink); font-weight: 650; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: #f8fafc; }
+    .gain-cell { color: var(--teal-dark); }
+    .schedule-empty { padding: 20px; color: var(--muted); text-align: center; }
+
+    footer { border-top: 1px solid var(--line); padding: 20px 0 24px; color: #94a3b8; text-align: center; font-size: 11px; }
+    footer span { padding-inline: 5px; }
+
+    @media (max-width: 820px) {
+      .shell { width: min(100% - 32px, 620px); }
+      .topbar { height: 68px; }
+      .brand { gap: 8px; font-size: 15px; }
+      .brand-mark { width: 31px; height: 31px; }
+      nav { gap: 1px; }
+      nav a { padding: 8px 9px; font-size: 11px; }
+      .hero { padding: 42px 4px 30px; }
+      h1 { letter-spacing: -1.4px; }
+      .workspace { grid-template-columns: 1fr; gap: 15px; }
+      .panel { padding: 22px; }
+      .schedule-panel { margin-bottom: 36px; }
+    }
+    @media (max-width: 430px) {
+      .shell { width: calc(100% - 24px); }
+      nav a { padding-inline: 7px; font-size: 10px; }
+      .panel { padding: 18px; }
+      .presets { gap: 6px; }
+      .preset { padding-inline: 8px; font-size: 9px; }
+      .result-grid { gap: 7px; }
+      .result-tile { padding: 11px 9px; }
+      .tile-label { font-size: 9px; }
+      .tile-value { font-size: 10px; }
+      .tile-value.roi { font-size: 12px; }
+      .schedule-panel { padding: 19px 15px 13px; }
+      th, td { padding-inline: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar shell">
+    <a class="brand" href="index.html" aria-label="FinPulse PK home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 16.5 9 11l3.2 3.2L20 6.5M14.5 6.5H20V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span>FinPulse PK</span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a href="index.html">Loan Estimator</a>
+      <a href="roi.html" aria-current="page">ROI Calculator</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero shell" aria-labelledby="page-title">
+      <div class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>Make your money work</div>
+      <h1 id="page-title">See your investment <span>grow over time.</span></h1>
+      <p class="hero-copy">Explore how your starting amount and regular contributions could add up. Adjust your assumptions to compare possibilities.</p>
+      <p class="tagline">Smart Financial Clarity, Instantly.</p>
+    </section>
+
+    <section class="workspace shell" aria-label="Investment and ROI calculator">
+      <section class="panel" aria-labelledby="inputs-title">
+        <div class="panel-heading">
+          <div>
+            <h2 id="inputs-title">Investment details</h2>
+            <p class="panel-subtitle">Shape an estimate around your goals.</p>
+          </div>
+          <span class="heading-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 18.5h16M6.5 15V9m5 6V5m5 10v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="m5 7 5.2-3 5.1 3.1L19 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
+
+        <div class="presets" role="group" aria-label="Investment scenario presets">
+          <button class="preset" type="button" data-preset="conservative" aria-pressed="false">Conservative Savings</button>
+          <button class="preset" type="button" data-preset="index" aria-pressed="false">Index Fund Growth</button>
+          <button class="preset" type="button" data-preset="aggressive" aria-pressed="false">Aggressive Portfolio</button>
+        </div>
+
+        <div class="field">
+          <div class="field-label-row">
+            <label for="initial-number">Initial investment</label>
+            <span class="field-hint">PKR</span>
+          </div>
+          <div class="number-wrap">
+            <span class="number-prefix" aria-hidden="true">PKR</span>
+            <input class="number-input numeric" id="initial-number" type="number" min="0" max="50000000" step="50000" value="1500000" inputmode="numeric">
+          </div>
+          <input id="initial-range" type="range" min="0" max="50000000" step="50000" value="1500000" aria-label="Initial investment slider">
+          <div class="range-limits"><span>PKR 0</span><span>PKR 50,000,000</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label-row">
+            <label for="monthly-number">Monthly contribution</label>
+            <span class="field-hint">PKR per month</span>
+          </div>
+          <div class="number-wrap">
+            <span class="number-prefix" aria-hidden="true">PKR</span>
+            <input class="number-input numeric" id="monthly-number" type="number" min="0" max="1000000" step="5000" value="25000" inputmode="numeric">
+          </div>
+          <input id="monthly-range" type="range" min="0" max="1000000" step="5000" value="25000" aria-label="Monthly contribution slider">
+          <div class="range-limits"><span>PKR 0</span><span>PKR 1,000,000</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label-row">
+            <label for="return-number">Expected annual return</label>
+            <span class="field-hint numeric" id="return-display">10.00% per year</span>
+          </div>
+          <div class="number-wrap">
+            <input class="number-input no-prefix with-suffix numeric" id="return-number" type="number" min="0" max="30" step="0.1" value="10.00" inputmode="decimal">
+            <span class="number-suffix" aria-hidden="true">%</span>
+          </div>
+          <input id="return-range" type="range" min="0" max="30" step="0.1" value="10" aria-label="Expected annual return slider">
+          <div class="range-limits"><span>0.00%</span><span>30.00%</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label-row">
+            <label for="years-number">Investment horizon</label>
+            <span class="field-hint">Whole years</span>
+          </div>
+          <div class="number-wrap">
+            <input class="number-input no-prefix with-suffix numeric" id="years-number" type="number" min="1" max="40" step="1" value="15" inputmode="numeric">
+            <span class="number-suffix" aria-hidden="true">years</span>
+          </div>
+          <input id="years-range" type="range" min="1" max="40" step="1" value="15" aria-label="Investment horizon slider">
+          <div class="range-limits"><span>1 year</span><span>40 years</span></div>
+        </div>
+      </section>
+
+      <section class="panel results-panel" aria-labelledby="results-title" aria-live="polite">
+        <div class="panel-heading">
+          <div>
+            <h2 id="results-title">Your projection</h2>
+            <p class="panel-subtitle">An estimate based on your chosen assumptions.</p>
+          </div>
+          <span class="heading-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 18.5h16M6.5 15V9m5 6V5m5 10v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="m5 7 5.2-3 5.1 3.1L19 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
+
+        <div class="result-feature">
+          <p class="result-label">Estimated future value</p>
+          <div class="feature-value"><span class="currency">PKR</span><span id="future-value">0</span></div>
+        </div>
+        <div class="result-grid">
+          <div class="result-tile">
+            <p class="tile-label">Total invested</p>
+            <p class="tile-value numeric">PKR <span id="total-invested">0</span></p>
+          </div>
+          <div class="result-tile">
+            <p class="tile-label">Net profit</p>
+            <p class="tile-value profit numeric">PKR <span id="net-profit">0</span></p>
+          </div>
+          <div class="result-tile">
+            <p class="tile-label">Total ROI</p>
+            <p class="tile-value roi numeric"><span id="total-roi">0.00</span>%</p>
+          </div>
+        </div>
+        <p class="method-note">Estimate assumes monthly compounding and contributions at each month’s end. Returns are illustrative, not guaranteed, and exclude fees and taxes.</p>
+      </section>
+    </section>
+
+    <section class="panel schedule-panel shell" aria-labelledby="schedule-title">
+      <div class="schedule-header">
+        <div>
+          <h2 id="schedule-title">Year-by-year growth</h2>
+          <p class="panel-subtitle">See how contributions and estimated growth build over time.</p>
+        </div>
+        <div class="schedule-total">Projection horizon<strong id="schedule-horizon">15 years</strong></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Year</th>
+              <th scope="col">Total invested</th>
+              <th scope="col">Estimated value</th>
+              <th scope="col">Investment growth</th>
+            </tr>
+          </thead>
+          <tbody id="schedule-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    For educational estimation only — not financial advice <span aria-hidden="true">·</span> 2026
+  </footer>
+
+  <script>
+    (() => {
+      const fields = {
+        initial: { number: document.getElementById("initial-number"), range: document.getElementById("initial-range"), min: 0, max: 50000000 },
+        monthly: { number: document.getElementById("monthly-number"), range: document.getElementById("monthly-range"), min: 0, max: 1000000 },
+        annualReturn: { number: document.getElementById("return-number"), range: document.getElementById("return-range"), min: 0, max: 30 },
+        years: { number: document.getElementById("years-number"), range: document.getElementById("years-range"), min: 1, max: 40 }
+      };
+      const outputs = {
+        futureValue: document.getElementById("future-value"),
+        totalInvested: document.getElementById("total-invested"),
+        netProfit: document.getElementById("net-profit"),
+        totalRoi: document.getElementById("total-roi"),
+        returnDisplay: document.getElementById("return-display"),
+        scheduleHorizon: document.getElementById("schedule-horizon"),
+        scheduleBody: document.getElementById("schedule-body")
+      };
+      const currency = new Intl.NumberFormat("en-PK", { maximumFractionDigits: 0 });
+
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      }
+
+      function futureValueAt(initial, monthly, monthlyRate, months) {
+        if (monthlyRate === 0) return initial + monthly * months;
+        const growthFactor = Math.pow(1 + monthlyRate, months);
+        return initial * growthFactor + monthly * ((growthFactor - 1) / monthlyRate);
+      }
+
+      function addScheduleRow(year, invested, value) {
+        const row = document.createElement("tr");
+        const yearCell = document.createElement("td");
+        const investedCell = document.createElement("td");
+        const valueCell = document.createElement("td");
+        const gainCell = document.createElement("td");
+        yearCell.textContent = `Year ${year}`;
+        investedCell.textContent = `PKR ${currency.format(Math.round(invested))}`;
+        valueCell.textContent = `PKR ${currency.format(Math.round(value))}`;
+        gainCell.textContent = `PKR ${currency.format(Math.round(value - invested))}`;
+        gainCell.className = "gain-cell numeric";
+        [yearCell, investedCell, valueCell, gainCell].forEach((cell) => row.append(cell));
+        return row;
+      }
+
+      function calculate() {
+        const initial = Number(fields.initial.number.value);
+        const monthly = Number(fields.monthly.number.value);
+        const annualReturn = Number(fields.annualReturn.number.value);
+        const years = Number(fields.years.number.value);
+        const monthlyRate = annualReturn / 1200;
+        const months = years * 12;
+        const invested = initial + monthly * months;
+        const futureValue = futureValueAt(initial, monthly, monthlyRate, months);
+        const profit = futureValue - invested;
+        const roi = invested === 0 ? 0 : profit / invested * 100;
+
+        outputs.futureValue.textContent = currency.format(Math.round(futureValue));
+        outputs.totalInvested.textContent = currency.format(Math.round(invested));
+        outputs.netProfit.textContent = currency.format(Math.round(profit));
+        outputs.totalRoi.textContent = roi.toFixed(2);
+        outputs.returnDisplay.textContent = `${annualReturn.toFixed(2)}% per year`;
+        outputs.scheduleHorizon.textContent = `${years} ${years === 1 ? "year" : "years"}`;
+
+        const rows = [];
+        for (let year = 1; year <= years; year += 1) {
+          const elapsedMonths = year * 12;
+          const yearInvested = initial + monthly * elapsedMonths;
+          rows.push(addScheduleRow(year, yearInvested, futureValueAt(initial, monthly, monthlyRate, elapsedMonths)));
+        }
+        outputs.scheduleBody.replaceChildren(...rows);
+      }
+
+      function syncField(field, source) {
+        const parsed = Number(field[source].value);
+        if (!Number.isFinite(parsed)) return;
+        const value = clamp(parsed, field.min, field.max);
+        field.number.value = value;
+        field.range.value = value;
+        document.querySelectorAll("[data-preset]").forEach((button) => button.setAttribute("aria-pressed", "false"));
+        calculate();
+      }
+
+      Object.values(fields).forEach((field) => {
+        field.number.addEventListener("input", () => syncField(field, "number"));
+        field.range.addEventListener("input", () => syncField(field, "range"));
+        field.number.addEventListener("blur", () => {
+          if (field.number.value === "") field.number.value = field.min;
+          syncField(field, "number");
+        });
+      });
+
+      const presets = {
+        conservative: { initial: 1000000, monthly: 20000, annualReturn: 5, years: 10 },
+        index: { initial: 1500000, monthly: 25000, annualReturn: 10, years: 15 },
+        aggressive: { initial: 2000000, monthly: 50000, annualReturn: 15, years: 20 }
+      };
+      document.querySelectorAll("[data-preset]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const preset = presets[button.dataset.preset];
+          Object.entries(preset).forEach(([key, value]) => {
+            fields[key].number.value = value;
+            fields[key].range.value = value;
+          });
+          document.querySelectorAll("[data-preset]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+          calculate();
+        });
+      });
+
+      calculate();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8fafc">
+  <meta name="description" content="Estimate your monthly loan installment and total repayment with the FinPulse PK loan and EMI estimator.">
+  <title>Loan &amp; EMI Estimator | FinPulse PK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #f8fafc;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --teal: #0d9488;
+      --teal-dark: #0f766e;
+      --teal-soft: #ccfbf1;
+      --amber: #d97706;
+      --amber-soft: #fef3c7;
+      --heading: "Plus Jakarta Sans", sans-serif;
+      --body: "Inter", sans-serif;
+      font-family: var(--body);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .numeric { font-variant-numeric: tabular-nums; }
+    .shell { width: min(1120px, calc(100% - 48px)); margin-inline: auto; }
+
+    .topbar {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(226, 232, 240, .8);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--ink);
+      text-decoration: none;
+      font: 800 17px/1 var(--heading);
+      letter-spacing: -.55px;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 11px;
+      color: white;
+      background: var(--teal);
+    }
+
+    .brand-mark svg { width: 19px; height: 19px; }
+
+    nav { display: flex; align-items: center; gap: 8px; }
+    nav a {
+      padding: 9px 13px;
+      border-radius: 9px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color .18s, background .18s;
+    }
+    nav a:hover, nav a[aria-current="page"] { color: var(--teal-dark); background: #e6fffb; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 64px 32px 54px;
+      text-align: center;
+    }
+
+    .hero::before, .hero::after {
+      position: absolute;
+      z-index: -1;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      content: "";
+      filter: blur(1px);
+    }
+    .hero::before { top: 5px; left: 3%; background: radial-gradient(circle, rgba(204, 251, 241, .7), transparent 70%); }
+    .hero::after { top: 20px; right: 3%; background: radial-gradient(circle, rgba(254, 243, 199, .55), transparent 70%); }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid #ccfbf1;
+      border-radius: 999px;
+      color: var(--teal-dark);
+      background: rgba(255,255,255,.72);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .075em;
+      text-transform: uppercase;
+    }
+    .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 760px;
+      margin: 19px auto 12px;
+      font: 800 clamp(34px, 5vw, 52px)/1.13 var(--heading);
+      letter-spacing: -2.3px;
+    }
+    h1 span { color: var(--teal); }
+    .hero-copy { max-width: 560px; margin: 0 auto; color: var(--muted); font-size: 16px; }
+    .tagline { margin: 14px 0 0; color: #475569; font-size: 13px; font-weight: 600; }
+
+    .estimator {
+      display: grid;
+      grid-template-columns: minmax(0, .94fr) minmax(0, 1.06fr);
+      gap: 22px;
+      padding-bottom: 66px;
+    }
+    .panel {
+      min-width: 0;
+      padding: 28px;
+      border: 1px solid rgba(226, 232, 240, .85);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: 0 12px 35px rgba(15, 23, 42, .045);
+    }
+    .panel-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+    h2 { margin-bottom: 4px; font: 700 19px/1.35 var(--heading); letter-spacing: -.4px; }
+    .panel-subtitle { margin: 0; color: var(--muted); font-size: 12px; }
+    .heading-icon {
+      display: grid;
+      flex: 0 0 38px;
+      height: 38px;
+      place-items: center;
+      border-radius: 12px;
+      color: var(--teal-dark);
+      background: #e6fffb;
+    }
+    .heading-icon svg { width: 20px; height: 20px; }
+
+    .presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 25px; }
+    .preset {
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: #475569;
+      background: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      transition: border-color .18s, color .18s, background .18s;
+    }
+    .preset:hover, .preset[aria-pressed="true"] { border-color: #5eead4; color: var(--teal-dark); background: #f0fdfa; }
+
+    .field { margin-bottom: 25px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 9px; }
+    .field label { color: #334155; font-size: 12px; font-weight: 650; }
+    .field-hint { color: #94a3b8; font-size: 10px; }
+    .number-wrap { position: relative; }
+    .number-prefix, .number-suffix {
+      position: absolute;
+      top: 50%;
+      color: #94a3b8;
+      font-size: 12px;
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+    .number-prefix { left: 13px; }
+    .number-suffix { right: 13px; }
+    .number-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 48px 0 48px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      outline: none;
+      color: var(--ink);
+      background: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .number-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13, 148, 136, .13); }
+    .number-input.no-prefix { padding-left: 13px; }
+    .number-input.with-suffix { padding-right: 43px; }
+
+    input[type="range"] {
+      display: block;
+      width: 100%;
+      height: 5px;
+      margin: 13px 0 0;
+      border-radius: 999px;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      background: #e2e8f0;
+      accent-color: var(--teal);
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      width: 16px; height: 16px; border: 3px solid #fff; border-radius: 50%;
+      appearance: none; -webkit-appearance: none; background: var(--teal);
+      box-shadow: 0 0 0 1px var(--teal), 0 2px 6px rgba(15, 23, 42, .18);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 11px; height: 11px; border: 3px solid #fff; border-radius: 50%;
+      background: var(--teal); box-shadow: 0 0 0 1px var(--teal), 0 2px 6px rgba(15, 23, 42, .18);
+    }
+    input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(13, 148, 136, .18), 0 0 0 1px var(--teal); }
+    .range-limits { display: flex; justify-content: space-between; margin-top: 7px; color: #94a3b8; font-size: 10px; }
+
+    .results-panel { display: flex; flex-direction: column; }
+    .emi-card {
+      position: relative;
+      overflow: hidden;
+      padding: 21px 22px;
+      border: 1px solid #ccfbf1;
+      border-radius: 13px;
+      background: linear-gradient(115deg, #f0fdfa, #f8fffe 72%);
+    }
+    .emi-card::after {
+      position: absolute;
+      right: -25px;
+      bottom: -61px;
+      width: 170px;
+      height: 170px;
+      border: 1px solid rgba(13,148,136,.1);
+      border-radius: 50%;
+      box-shadow: 0 0 0 20px rgba(13,148,136,.025), 0 0 0 42px rgba(13,148,136,.02);
+      content: "";
+    }
+    .result-label { margin-bottom: 7px; color: #475569; font-size: 12px; font-weight: 600; }
+    .emi-value {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 7px;
+      font: 800 clamp(26px, 3.2vw, 36px)/1.2 var(--heading);
+      letter-spacing: -1.2px;
+      font-variant-numeric: tabular-nums;
+    }
+    .emi-value .currency { color: var(--teal-dark); font: 700 13px/1 var(--body); letter-spacing: 0; }
+    .per-month { margin-left: 2px; color: var(--muted); font: 500 12px/1 var(--body); letter-spacing: 0; }
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 13px 0 22px; }
+    .result-tile { padding: 16px; border: 1px solid var(--line); border-radius: 11px; background: #fff; }
+    .tile-label { margin-bottom: 8px; color: var(--muted); font-size: 11px; font-weight: 500; }
+    .tile-value { color: var(--ink); font-size: 14px; font-weight: 700; letter-spacing: -.2px; }
+    .tile-value.markup { color: var(--amber); }
+
+    .breakdown { margin-top: auto; padding-top: 3px; }
+    .breakdown-title { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+    .breakdown-title strong { font-size: 12px; font-weight: 650; }
+    .breakdown-title span { color: var(--muted); font-size: 10px; }
+    .bar-track { display: flex; overflow: hidden; width: 100%; height: 12px; border-radius: 999px; background: #e2e8f0; }
+    .bar-principal { width: 80%; background: var(--teal); transition: width .25s ease; }
+    .bar-markup { flex: 1; background: var(--amber); transition: width .25s ease; }
+    .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 7px; color: #64748b; font-size: 10px; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 3px; background: var(--teal); }
+    .legend-dot.amber { background: var(--amber); }
+    .legend-item strong { color: #334155; font-size: 10px; font-weight: 650; }
+    .note { margin: 17px 0 0; color: #94a3b8; font-size: 10px; line-height: 1.5; }
+
+    footer { border-top: 1px solid var(--line); padding: 20px 0 24px; color: #94a3b8; text-align: center; font-size: 11px; }
+    footer span { padding-inline: 5px; }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 32px, 560px); }
+      .topbar { height: 68px; }
+      .brand { gap: 8px; font-size: 15px; }
+      .brand-mark { width: 31px; height: 31px; }
+      nav { gap: 1px; }
+      nav a { padding: 8px 9px; font-size: 11px; }
+      .hero { padding: 48px 4px 38px; }
+      h1 { letter-spacing: -1.4px; }
+      .hero-copy { font-size: 14px; }
+      .estimator { grid-template-columns: 1fr; gap: 16px; padding-bottom: 42px; }
+      .panel { padding: 23px; }
+      .result-grid { margin-bottom: 20px; }
+    }
+
+    @media (max-width: 390px) {
+      .shell { width: calc(100% - 24px); }
+      nav a { padding-inline: 7px; font-size: 10px; }
+      .panel { padding: 19px; }
+      .preset { padding-inline: 9px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar shell">
+    <a class="brand" href="index.html" aria-label="FinPulse PK home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 16.5 9 11l3.2 3.2L20 6.5M14.5 6.5H20V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span>FinPulse PK</span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a href="index.html" aria-current="page">Loan Estimator</a>
+      <a href="roi.html">ROI Calculator</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero shell" aria-labelledby="page-title">
+      <div class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>Plan with confidence</div>
+      <h1 id="page-title">Know your loan before <span>you commit.</span></h1>
+      <p class="hero-copy">Get a clear estimate of your monthly installment and total repayment. Adjust the numbers and find a plan that fits.</p>
+      <p class="tagline">Smart Financial Clarity, Instantly.</p>
+    </section>
+
+    <section class="estimator shell" aria-label="Loan and EMI estimator">
+      <section class="panel" aria-labelledby="inputs-title">
+        <div class="panel-heading">
+          <div>
+            <h2 id="inputs-title">Loan details</h2>
+            <p class="panel-subtitle">Set your amount, rate, and repayment period.</p>
+          </div>
+          <span class="heading-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="3.5" width="16" height="17" rx="2.5" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M8 7.5h8M8 11.5h2m4 0h2m-8 4h2m4 0h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </div>
+
+        <div class="presets" role="group" aria-label="Loan presets">
+          <button class="preset" type="button" data-preset="auto" aria-pressed="false">Auto Loan</button>
+          <button class="preset" type="button" data-preset="personal" aria-pressed="false">Personal Loan</button>
+          <button class="preset" type="button" data-preset="home" aria-pressed="false">Home Financing</button>
+        </div>
+
+        <div class="field">
+          <div class="field-label-row">
+            <label for="amount-number">Loan amount</label>
+            <span class="field-hint">PKR</span>
+          </div>
+          <div class="number-wrap">
+            <span class="number-prefix" aria-hidden="true">PKR</span>
+            <input class="number-input numeric" id="amount-number" type="number" min="100000" max="50000000" step="50000" value="2500000" inputmode="numeric">
+          </div>
+          <input id="amount-range" type="range" min="100000" max="50000000" step="50000" value="2500000" aria-label="Loan amount slider">
+          <div class="range-limits"><span>PKR 100,000</span><span>PKR 50,000,000</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label-row">
+            <label for="rate-number">Annual markup rate</label>
+            <span class="field-hint numeric" id="rate-display">14.50% per year</span>
+          </div>
+          <div class="number-wrap">
+            <input class="number-input no-prefix with-suffix numeric" id="rate-number" type="number" min="0" max="40" step="0.05" value="14.50" inputmode="decimal">
+            <span class="number-suffix" aria-hidden="true">%</span>
+          </div>
+          <input id="rate-range" type="range" min="0" max="40" step="0.05" value="14.50" aria-label="Annual markup rate slider">
+          <div class="range-limits"><span>0.00%</span><span>40.00%</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label-row">
+            <label for="tenure-number">Tenure</label>
+            <span class="field-hint">In months</span>
+          </div>
+          <div class="number-wrap">
+            <input class="number-input no-prefix with-suffix numeric" id="tenure-number" type="number" min="1" max="360" step="1" value="60" inputmode="numeric">
+            <span class="number-suffix" aria-hidden="true">months</span>
+          </div>
+          <input id="tenure-range" type="range" min="1" max="360" step="1" value="60" aria-label="Tenure slider">
+          <div class="range-limits"><span>1 month</span><span>30 years</span></div>
+        </div>
+      </section>
+
+      <section class="panel results-panel" aria-labelledby="results-title" aria-live="polite">
+        <div class="panel-heading">
+          <div>
+            <h2 id="results-title">Your estimate</h2>
+            <p class="panel-subtitle">A simple view of your repayment plan.</p>
+          </div>
+          <span class="heading-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 18.5h16M6.5 15V9m5 6V5m5 10v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="m5 7 5.2-3 5.1 3.1L19 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
+
+        <div class="emi-card">
+          <p class="result-label">Estimated monthly EMI</p>
+          <div class="emi-value numeric"><span class="currency">PKR</span><span id="emi-output">58,846</span><span class="per-month">/ month</span></div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-tile">
+            <p class="tile-label">Total markup paid</p>
+            <p class="tile-value markup numeric">PKR <span id="markup-output">1,030,760</span></p>
+          </div>
+          <div class="result-tile">
+            <p class="tile-label">Total repayment</p>
+            <p class="tile-value numeric">PKR <span id="repayment-output">3,530,760</span></p>
+          </div>
+        </div>
+
+        <div class="breakdown">
+          <div class="breakdown-title">
+            <strong>Repayment breakdown</strong>
+            <span id="breakdown-caption">Principal vs. markup</span>
+          </div>
+          <div class="bar-track" role="img" id="breakdown-bar" aria-label="Repayment breakdown: principal 71 percent, markup 29 percent">
+            <div class="bar-principal" id="principal-bar"></div>
+            <div class="bar-markup" id="markup-bar"></div>
+          </div>
+          <div class="legend">
+            <div class="legend-item"><span class="legend-dot" aria-hidden="true"></span>Principal <strong class="numeric" id="principal-share">71%</strong></div>
+            <div class="legend-item"><span class="legend-dot amber" aria-hidden="true"></span>Markup <strong class="numeric" id="markup-share">29%</strong></div>
+          </div>
+        </div>
+        <p class="note">Estimate uses monthly compounding on a reducing balance. Actual terms may vary by lender and fees.</p>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    For educational estimation only — not financial advice <span aria-hidden="true">·</span> 2026
+  </footer>
+
+  <script>
+    (() => {
+      const fields = {
+        amount: { number: document.getElementById("amount-number"), range: document.getElementById("amount-range"), min: 100000, max: 50000000 },
+        rate: { number: document.getElementById("rate-number"), range: document.getElementById("rate-range"), min: 0, max: 40 },
+        tenure: { number: document.getElementById("tenure-number"), range: document.getElementById("tenure-range"), min: 1, max: 360 }
+      };
+      const outputs = {
+        emi: document.getElementById("emi-output"),
+        markup: document.getElementById("markup-output"),
+        repayment: document.getElementById("repayment-output"),
+        principalBar: document.getElementById("principal-bar"),
+        markupBar: document.getElementById("markup-bar"),
+        principalShare: document.getElementById("principal-share"),
+        markupShare: document.getElementById("markup-share"),
+        rateDisplay: document.getElementById("rate-display"),
+        breakdownBar: document.getElementById("breakdown-bar")
+      };
+      const currency = new Intl.NumberFormat("en-PK", { maximumFractionDigits: 0 });
+
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      }
+
+      function syncField(field, source) {
+        const parsed = Number(field[source].value);
+        if (!Number.isFinite(parsed)) return;
+        const value = clamp(parsed, field.min, field.max);
+        field.number.value = value;
+        field.range.value = value;
+        calculate();
+      }
+
+      function calculate() {
+        const principal = Number(fields.amount.number.value);
+        const annualRate = Number(fields.rate.number.value);
+        const months = Number(fields.tenure.number.value);
+        const monthlyRate = annualRate / 1200;
+        const emi = monthlyRate === 0
+          ? principal / months
+          : principal * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+        const totalRepayment = emi * months;
+        const totalMarkup = Math.max(0, totalRepayment - principal);
+        const principalPercent = totalRepayment > 0 ? principal / totalRepayment * 100 : 100;
+        const markupPercent = 100 - principalPercent;
+        const roundedPrincipalPercent = Math.round(principalPercent);
+        const roundedMarkupPercent = 100 - roundedPrincipalPercent;
+
+        outputs.emi.textContent = currency.format(Math.round(emi));
+        outputs.markup.textContent = currency.format(Math.round(totalMarkup));
+        outputs.repayment.textContent = currency.format(Math.round(totalRepayment));
+        outputs.rateDisplay.textContent = `${annualRate.toFixed(2)}% per year`;
+        outputs.principalBar.style.width = `${principalPercent}%`;
+        outputs.markupBar.style.width = `${markupPercent}%`;
+        outputs.principalShare.textContent = `${roundedPrincipalPercent}%`;
+        outputs.markupShare.textContent = `${roundedMarkupPercent}%`;
+        outputs.breakdownBar.setAttribute(
+          "aria-label",
+          `Repayment breakdown: principal ${roundedPrincipalPercent} percent, markup ${roundedMarkupPercent} percent`
+        );
+      }
+
+      Object.values(fields).forEach((field) => {
+        field.number.addEventListener("input", () => syncField(field, "number"));
+        field.range.addEventListener("input", () => syncField(field, "range"));
+        field.number.addEventListener("blur", () => {
+          if (field.number.value === "") field.number.value = field.min;
+          syncField(field, "number");
+        });
+      });
+
+      const presets = {
+        auto: { amount: 2500000, rate: 14.5, tenure: 60 },
+        personal: { amount: 750000, rate: 20, tenure: 36 },
+        home: { amount: 10000000, rate: 12.5, tenure: 240 }
+      };
+      document.querySelectorAll("[data-preset]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const preset = presets[button.dataset.preset];
+          Object.entries(preset).forEach(([key, value]) => {
+            fields[key].number.value = value;
+            fields[key].range.value = value;
+          });
+          document.querySelectorAll("[data-preset]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+          calculate();
+        });
+      });
+
+      calculate();
+    })();
+  </script>
+</body>
+</html>
