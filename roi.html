@@ -227,6 +227,21 @@
     .tile-value.profit { color: var(--amber); }
     .tile-value.roi { color: var(--teal-dark); font-size: 14px; }
     .method-note { margin: 13px 0 0; color: #94a3b8; font-size: 9px; line-height: 1.55; }
+    .copy-button {
+      align-self: flex-start;
+      margin-top: 16px;
+      padding: 10px 14px;
+      border: 0;
+      border-radius: 9px;
+      color: #fff;
+      background: var(--teal);
+      font-size: 12px;
+      font-weight: 650;
+      transition: background .18s, box-shadow .18s;
+    }
+    .copy-button:hover { background: var(--teal-dark); }
+    .copy-button:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(13, 148, 136, .2); }
+    .copy-status { min-height: 20px; margin: 7px 0 0; color: var(--teal-dark); font-size: 11px; }
 
     .schedule-panel { margin-bottom: 48px; padding: 24px 25px 16px; }
     .schedule-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 14px; }
@@ -408,6 +423,8 @@
           </div>
         </div>
         <p class="method-note">Estimate assumes monthly compounding and contributions at each month’s end. Returns are illustrative, not guaranteed, and exclude fees and taxes.</p>
+        <button class="copy-button" id="copy-summary" type="button">Copy Calculation Summary</button>
+        <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
       </section>
     </section>
 
@@ -454,7 +471,8 @@
         totalRoi: document.getElementById("total-roi"),
         returnDisplay: document.getElementById("return-display"),
         scheduleHorizon: document.getElementById("schedule-horizon"),
-        scheduleBody: document.getElementById("schedule-body")
+        scheduleBody: document.getElementById("schedule-body"),
+        copyStatus: document.getElementById("copy-status")
       };
       const currency = new Intl.NumberFormat("en-PK", { maximumFractionDigits: 0 });
 
@@ -484,6 +502,7 @@
       }
 
       function calculate() {
+        outputs.copyStatus.textContent = "";
         const initial = Number(fields.initial.number.value);
         const monthly = Number(fields.monthly.number.value);
         const annualReturn = Number(fields.annualReturn.number.value);
@@ -510,6 +529,35 @@
         }
         outputs.scheduleBody.replaceChildren(...rows);
       }
+
+      async function copyCalculationSummary() {
+        const formatMoney = (value) => `PKR ${currency.format(Math.round(value))}`;
+        const summary = [
+          "FinPulse PK — ROI Calculation Summary",
+          `Initial investment: ${formatMoney(Number(fields.initial.number.value))}`,
+          `Monthly contribution: ${formatMoney(Number(fields.monthly.number.value))}`,
+          `Expected annual return: ${Number(fields.annualReturn.number.value).toFixed(2)}%`,
+          `Investment horizon: ${fields.years.number.value} ${Number(fields.years.number.value) === 1 ? "year" : "years"}`,
+          `Estimated future value: PKR ${outputs.futureValue.textContent}`,
+          `Total invested: PKR ${outputs.totalInvested.textContent}`,
+          `Net profit: PKR ${outputs.netProfit.textContent}`,
+          `Total ROI: ${outputs.totalRoi.textContent}%`
+        ].join("\n");
+
+        if (!navigator.clipboard?.writeText) {
+          outputs.copyStatus.textContent = "Clipboard access is unavailable in this browser.";
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(summary);
+          outputs.copyStatus.textContent = "Calculation summary copied.";
+        } catch {
+          outputs.copyStatus.textContent = "Could not copy the summary. Check clipboard permissions and try again.";
+        }
+      }
+
+      document.getElementById("copy-summary").addEventListener("click", copyCalculationSummary);
 
       function syncField(field, source) {
         const parsed = Number(field[source].value);
